@@ -17,10 +17,17 @@ def format_date(date_str):
         return date_str.replace('-', '/')
     return date_str
 
+def decode_content(file_content):
+    try:
+        return file_content.decode('utf-8-sig')
+    except UnicodeDecodeError:
+        return file_content.decode('cp932', errors='replace')
+
 @st.cache_data
 def parse_txt(file_content):
     data = []
-    lines = file_content.decode('shift_jis', errors='replace').splitlines()
+    content = decode_content(file_content)
+    lines = content.splitlines()
     for line in lines:
         if not line.strip(): continue
         row = line.split('\t')
@@ -70,7 +77,7 @@ def parse_txt(file_content):
 @st.cache_data
 def parse_csv(file_content):
     data = []
-    content = file_content.decode('shift_jis', errors='replace')
+    content = decode_content(file_content)
     reader = csv.reader(io.StringIO(content))
     
     for row in reader:
